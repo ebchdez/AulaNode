@@ -1,21 +1,34 @@
 import chalk from "chalk";
 import fs from 'fs';
-import { text } from "stream/consumers";
+
+function extraiLinks(texto){
+    const regex = /\[([^\]]*)\]\((https?:\/\/[^$#\s].[^\s]*)\)/gm;
+    const arrayResultados = [];
+
+    let temp;
+    while((temp = regex.exec(texto)) != null){
+        arrayResultados.push({ [temp[1]] : [temp[2]]})
+    }
+    return(arrayResultados.length === 0 ? "Não há links"  : arrayResultados);
+}
 
 function trataErro(erro){
     throw new Error(chalk.red(erro.code, "Caminho errado"));
 }
-
 async function pegarArquivo(caminhoDoArquivo){
     const encoding = "utf-8";
-    try{const texto = await fs.promises.readFile(caminhoDoArquivo, encoding)
-    console.log(chalk.blue(texto))
+    try{
+        const texto = await fs.promises.readFile(caminhoDoArquivo, 
+            encoding)
+        return(extraiLinks(texto))
     } catch(erro){
-    trataErro(erro);
+        trataErro(erro);
     }
 }
 
+//pegarArquivo('./arquivos/texto.md');
 
+export default pegarArquivo;
 
 //function pegarArquivo(caminhoDoArquivo){
 //    const encoding = "utf-8";
@@ -36,4 +49,4 @@ async function pegarArquivo(caminhoDoArquivo){
 //}
 
 //pegarArquivo('');
-pegarArquivo('./arquivos/texto.md');
+
